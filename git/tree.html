@@ -77,7 +77,7 @@
             }
 
             var myid = query[0];
-            var fileName = "tree.json";
+            var fileName = decodeURIComponent(query[1] || "tree.json");
 
             // fetch data
             $.ajax({
@@ -87,6 +87,7 @@
                 async: false
             }).success(function(data) {
                 content = data.data.files[fileName].content;
+                content = $.parseJSON(content);
                 if (content.length && content[0].children) {
                     result = content[0].children
                 }
