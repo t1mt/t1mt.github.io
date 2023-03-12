@@ -24,6 +24,7 @@
     <!-- Delete ".min" for console warnings in development -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery@2.2.4/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/github/fetch@master/fetch.js"></script>
   </head>
   <body>
 
@@ -111,7 +112,7 @@
         }
 
         var treeData = fetchTreeData()
-        
+
         var data = {
             title: 'Tree',
             open: true
