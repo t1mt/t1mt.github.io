@@ -5,11 +5,7 @@
   }
 
   function showError (message) {
-    document.getElementById('alert-box').innerHTML
-      += '<div class="alert alert-danger">'
-      +    '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'
-      +    message
-      +  '</div>';
+    console.log("Error", message)
   }
 
   // 1. check query string
@@ -54,7 +50,6 @@
     document.write(content);
   })
   .catch(function (err) {
-    showMainPage();
     showError(err.message);
   });
 })();
