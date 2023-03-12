@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>My Bookmaorks</title>
+    <title>My Tree Viewer</title>
     <style>
       body {
         font-family: Menlo, Consolas, monospace;
@@ -62,49 +62,56 @@
     </ul>
 
     <script>
-
-        var treeData = [];
-
         function showError (message) {
             console.log("Error", message)
         }
 
-        query = query.split('/');
-        var myid = query[0];
-        var fileName = decodeURIComponent(query[1] || '');
-
-        // fetch data
-        fetch('https://api.github.com/gists/' + myid)
-        .then(function (res) {
-            return res.json().then(function (body) {
-                if (res.status === 200) {
-                    return body;
-                }
-                console.log(res, body); // debug
-                throw new Error('<strong>' + myid + '</strong>, ' + body.message.replace(/\(.*\)/, ''));
-            });
-        })
-        .then(function (info) {
-            if (fileName === '') {
-                for (var file in info.files) {
-                    // tree.json or the first file
-                    if (fileName === '' || file === 'tree.json') {
-                    fileName = file;
+        function fetchTreeData() {
+            var result = []
+            var query = location.search.substring(1);
+            query = query.split('/');
+            
+            if (query.length === 0) {
+                return result;
+            }
+            var myid = query[0];
+            var fileName = decodeURIComponent(query[1] || '');
+            // fetch data
+            fetch('https://api.github.com/gists/' + myid)
+            .then(function (res) {
+                return res.json().then(function (body) {
+                    if (res.status === 200) {
+                        return body;
+                    }
+                    console.log(res, body); // debug
+                    throw new Error('<strong>' + myid + '</strong>, ' + body.message.replace(/\(.*\)/, ''));
+                });
+            })
+            .then(function (info) {
+                if (fileName === '') {
+                    for (var file in info.files) {
+                        // tree.json or the first file
+                        if (fileName === '' || file === 'tree.json') {
+                            fileName = file;
+                        }
                     }
                 }
-            }
-            if (info.files.hasOwnProperty(fileName) === false) {
-                throw new Error('File <strong>' + fileName + '</strong> is not exist');
-            }
+                if (info.files.hasOwnProperty(fileName) === false) {
+                    throw new Error('File <strong>' + fileName + '</strong> is not exist');
+                }
 
-            // 5. write data
-            treeData = info.files[fileName].content;
-            
-        })
-        .catch(function (err) {
-            showError(err.message);
-        });
+                // data
+                result = info.files[fileName].content;
+                
+            })
+            .catch(function (err) {
+                showError(err.message);
+            });
+            return result
+        }
 
+        var treeData = fetchTreeData()
+        
         var data = {
             title: 'Tree',
             open: true
