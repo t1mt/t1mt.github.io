@@ -1,0 +1,163 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>My Bookmaorks</title>
+    <style>
+      body {
+        font-family: Menlo, Consolas, monospace;
+        color: #444;
+      }
+      .item {
+        cursor: pointer;
+      }
+      .bold {
+        font-weight: bold;
+      }
+      ul {
+        padding-left: 1em;
+        line-height: 1.5em;
+        list-style-type: dot;
+      }
+    </style>
+    <!-- Delete ".min" for console warnings in development -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@2.2.4/dist/jquery.min.js"></script>
+  </head>
+  <body>
+
+    <!-- item template -->
+    <script type="text/x-template" id="item-template">
+      <li>
+        <div
+          :class="{bold: isFolder}"
+          @click="toggle"
+          @dblclick="changeType">
+          <span v-if="model.url">
+              <a target="_blank" :href="model.url">{{model.title}}</a>
+          </span>
+          <span v-else>
+              {{model.title}}
+          </span>
+          <span v-if="isFolder">[{{model.open || open ? '-' : '+'}}]</span>
+        </div>
+        <ul v-show="model.open || open" v-if="isFolder">
+          <item
+            class="item"
+            v-for="model in model.children"
+            :model="model">
+          </item>
+          
+        </ul>
+      </li>
+    </script>
+
+    <!-- the demo root element -->
+    <ul id="demo">
+      <item
+        class="item"
+        :model="treeData">
+      </item>
+    </ul>
+
+    <script>
+
+        var treeData = [];
+
+        function showError (message) {
+            console.log("Error", message)
+        }
+
+        query = query.split('/');
+        var myid = query[0];
+        var fileName = decodeURIComponent(query[1] || '');
+
+        // fetch data
+        fetch('https://api.github.com/gists/' + myid)
+        .then(function (res) {
+            return res.json().then(function (body) {
+                if (res.status === 200) {
+                    return body;
+                }
+                console.log(res, body); // debug
+                throw new Error('<strong>' + myid + '</strong>, ' + body.message.replace(/\(.*\)/, ''));
+            });
+        })
+        .then(function (info) {
+            if (fileName === '') {
+                for (var file in info.files) {
+                    // tree.json or the first file
+                    if (fileName === '' || file === 'tree.json') {
+                    fileName = file;
+                    }
+                }
+            }
+            if (info.files.hasOwnProperty(fileName) === false) {
+                throw new Error('File <strong>' + fileName + '</strong> is not exist');
+            }
+
+            // 5. write data
+            treeData = info.files[fileName].content;
+            
+        })
+        .catch(function (err) {
+            showError(err.message);
+        });
+
+        var data = {
+            title: 'Tree',
+            open: true
+        }
+
+        if (treeData.length && treeData[0].children) {
+            data.children = treeData[0].children
+        }
+
+        // define the item component
+        Vue.component('item', {
+            template: '#item-template',
+            props: {
+                model: Object
+            },
+            data: function () {
+                return {
+                    open: false
+                }
+            },
+            computed: {
+                isFolder: function () {
+                    return this.model.children && this.model.children.length
+                }
+            },
+            methods: {
+                toggle: function () {
+                    if (this.isFolder) {
+                        this.open = !this.open
+                    }
+                },
+                changeType: function () {
+                    if (!this.isFolder) {
+                        Vue.set(this.model, 'children', [])
+                        this.addChild()
+                        this.open = true
+                    }
+                },
+                addChild: function () {
+                    this.model.children.push({
+                        name: 'new stuff'
+                    })
+                }
+            }
+        })
+
+        // boot up the demo
+        var demo = new Vue({
+            el: '#demo',
+            data: {
+                treeData: data
+            }
+        })
+    </script>
+  </body>
+</html>
