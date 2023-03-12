@@ -1,9 +1,4 @@
 (function () {
-  function showMainPage () {
-    document.getElementById('main').className = 'container';  // remove class 'hide'
-    document.getElementById('loading').className += ' hide';  // add class 'hide'
-  }
-
   function showError (message) {
     console.log("Error", message)
   }
@@ -11,7 +6,6 @@
   // 1. check query string
   var query = location.search.substring(1);
   if (query.length === 0) {
-    // showMainPage();
     return;
   }
 
@@ -27,7 +21,7 @@
       if (res.status === 200) {
         return body;
       }
-      // console.log(res, body); // debug
+      console.log(res, body); // debug
       throw new Error('<strong>' + myid + '</strong>, ' + body.message.replace(/\(.*\)/, ''));
     });
   })
