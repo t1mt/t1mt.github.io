@@ -111,9 +111,8 @@
                 dataType: 'jsonp',
                 type: 'GET',
                 url: 'https://api.github.com/gists/'+myid,
-                async: false,
+                async: true,
                 success: function(data) {
-                    console.log("====", data)
                     content = data.data.files[fileName].content;
                     gistData = $.parseJSON(content);
     
@@ -122,11 +121,9 @@
                         open: true,
                     }
     
-                    console.log("========= ", gistData)
                     if (gistData.length && gistData[0].children) {
                         treeData.children = gistData[0].children
                     }
-                    console.log("-----", treeData)
                     
                     // boot up the demo
                     var demo = new Vue({
@@ -143,7 +140,6 @@
             });
             
         }
-
 
     </script>
   </body>
