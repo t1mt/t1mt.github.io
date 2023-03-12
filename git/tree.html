@@ -74,39 +74,26 @@
             query = query.split('/');
             
             if (query.length === 0) {
-                return result;
+                return;
             }
-            var myid = query[0];
-            var fileName = decodeURIComponent(query[1] || '');
-            // fetch data
-            fetch('https://api.github.com/gists/' + myid)
-            .then(function (res) {
-                return res.json().then(function (body) {
-                    if (res.status === 200) {
-                        return body;
-                    }
-                    console.log(res, body); // debug
-                    throw new Error('<strong>' + myid + '</strong>, ' + body.message.replace(/\(.*\)/, ''));
-                });
-            })
-            .then(function (info) {
-                if (fileName === '') {
-                    for (var file in info.files) {
-                        // tree.json or the first file
-                        if (fileName === '' || file === 'tree.json') {
-                            fileName = file;
-                        }
-                    }
-                }
-                if (info.files.hasOwnProperty(fileName) === false) {
-                    throw new Error('File <strong>' + fileName + '</strong> is not exist');
-                }
 
-                // data
-                result = info.files[fileName].content[0].children;
-            })
-            .catch(function (err) {
-                showError(err.message);
+            var myid = query[0];
+            var fileName = "tree.json";
+
+            // fetch data
+            $.ajax({
+                url: 'https://api.github.com/gists/'+myid,
+                type: 'GET',
+                dataType: 'jsonp',
+                async: false
+            }).success(function(data) {
+                content = data.data.files[filename].content;
+                if (content.length && content[0].children) {
+                    result = content[0].children
+                }
+            }).error(function(e) {
+                // ajax error
+                showError(e);
             });
 
             return result
