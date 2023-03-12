@@ -62,48 +62,39 @@
     </ul>
 
     <script>
-       
-        function showError (message) {
-            console.log("Error", message)
-        }
+        var query = location.search.substring(1);
+        query = query.split('/');
+    
+        var myid = query[0];
+        var fileName = decodeURIComponent(query[1] || "tree.json");
 
-        function fetchTreeData() {
-            var result = []
-            var query = location.search.substring(1);
-            query = query.split('/');
-            
-            if (query.length === 0) {
-                return;
-            }
-
-            var myid = query[0];
-            var fileName = decodeURIComponent(query[1] || "tree.json");
-
-            // fetch data
-            $.ajax({
-                url: 'https://api.github.com/gists/'+myid,
-                type: 'GET',
-                dataType: 'jsonp',
-                async: false
-            }).success(function(data) {
+        // fetch data
+        var gistData = [] 
+        $.ajax({
+            dataType: 'jsonp',
+            type: 'GET',
+            url: 'https://api.github.com/gists/'+myid,
+            async: false,
+            success: function(data) {
+                console.log("====", data)
                 content = data.data.files[fileName].content;
-                content = $.parseJSON(content);
-                if (content.length && content[0].children) {
-                    result = content[0].children
-                }
-            }).error(function(e) {
-                // ajax error
-                showError(e);
-            });
+                gistData = $.parseJSON(content);
+            },
+            error: function(e) {
+                console.log("error", e)
+            }
+        });
 
-            return result
-        }
-
-        var data = {
-            title: 'Tree',
+        var treeData = {
+            title: 'My Data',
             open: true,
-            children: fetchTreeData()
         }
+
+        console.log("========= ", gistData)
+        if (gistData.length && gistData[0].children) {
+            treeData.children = gistData[0].children
+        }
+        console.log("-----", treeData)
 
         // define the item component
         Vue.component('item', {
@@ -140,15 +131,16 @@
                     })
                 }
             }
-        })
+        });
 
         // boot up the demo
         var demo = new Vue({
             el: '#demo',
             data: {
-                treeData: data
+                treeData: treeData
             }
         })
+
     </script>
   </body>
 </html>
