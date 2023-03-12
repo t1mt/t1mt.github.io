@@ -11,7 +11,7 @@
   // 1. check query string
   var query = location.search.substring(1);
   if (query.length === 0) {
-    showMainPage();
+    // showMainPage();
     return;
   }
 
