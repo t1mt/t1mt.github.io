@@ -62,40 +62,6 @@
     </ul>
 
     <script>
-        var query = location.search.substring(1);
-        query = query.split('/');
-    
-        var myid = query[0];
-        var fileName = decodeURIComponent(query[1] || "tree.json");
-
-        // fetch data
-        var gistData = [] 
-        $.ajax({
-            dataType: 'jsonp',
-            type: 'GET',
-            url: 'https://api.github.com/gists/'+myid,
-            async: false,
-            success: function(data) {
-                console.log("====", data)
-                content = data.data.files[fileName].content;
-                gistData = $.parseJSON(content);
-            },
-            error: function(e) {
-                console.log("error", e)
-            }
-        });
-
-        var treeData = {
-            title: 'My Data',
-            open: true,
-        }
-
-        console.log("========= ", gistData)
-        if (gistData.length && gistData[0].children) {
-            treeData.children = gistData[0].children
-        }
-        console.log("-----", treeData)
-
         // define the item component
         Vue.component('item', {
             template: '#item-template',
@@ -133,13 +99,51 @@
             }
         });
 
-        // boot up the demo
-        var demo = new Vue({
-            el: '#demo',
-            data: {
-                treeData: treeData
+        var query = location.search.substring(1);
+        query = query.split('/');
+    
+        if (query.length === 0) {
+            return;
+        }
+
+        var myid = query[0];
+        var fileName = decodeURIComponent(query[1] || "tree.json");
+
+        // fetch data
+        $.ajax({
+            dataType: 'jsonp',
+            type: 'GET',
+            url: 'https://api.github.com/gists/'+myid,
+            async: false,
+            success: function(data) {
+                console.log("====", data)
+                content = data.data.files[fileName].content;
+                gistData = $.parseJSON(content);
+
+                var treeData = {
+                    title: 'My Data',
+                    open: true,
+                }
+
+                console.log("========= ", gistData)
+                if (gistData.length && gistData[0].children) {
+                    treeData.children = gistData[0].children
+                }
+                console.log("-----", treeData)
+                
+                // boot up the demo
+                var demo = new Vue({
+                    el: '#demo',
+                    data: {
+                        treeData: treeData
+                    }
+                })
+
+            },
+            error: function(e) {
+                console.log("error", e)
             }
-        })
+        });
 
     </script>
   </body>
