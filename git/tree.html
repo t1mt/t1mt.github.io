@@ -24,7 +24,6 @@
     <!-- Delete ".min" for console warnings in development -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery@2.2.4/dist/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/github/fetch@master/fetch.js"></script>
   </head>
   <body>
 
@@ -87,7 +86,7 @@
                 dataType: 'jsonp',
                 async: false
             }).success(function(data) {
-                content = data.data.files[filename].content;
+                content = data.data.files[fileName].content;
                 if (content.length && content[0].children) {
                     result = content[0].children
                 }
@@ -104,10 +103,6 @@
             open: true,
             children: fetchTreeData()
         }
-
-        /* if (treeData.length && treeData[0].children) {
-            data.children = treeData[0].children
-        } */
 
         // define the item component
         Vue.component('item', {
