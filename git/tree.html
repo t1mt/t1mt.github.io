@@ -104,7 +104,8 @@
     
         if (query.length !== 0) {
             var myid = query[0];
-            var fileName = decodeURIComponent(query[1] || "tree.json");
+            // var fileName = decodeURIComponent(query[1] || "tree.json");
+            var fileName = decodeURIComponent(query[1] || "btree.json");
     
             // fetch data
             $.ajax({
