@@ -114,7 +114,8 @@
                 async: true,
                 success: function(data) {
                     content = data.data.files[fileName].content;
-                    gistData = $.parseJSON(content);
+                    bookmarks = $.parseJSON(content);
+                    gistData = bookmarks.bookmarks;                  
     
                     var treeData = {
                         title: 'My Data',
